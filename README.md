@@ -4,6 +4,8 @@ A collection of python functions to automate pentesting & threat hunting on a sy
 
 Feel free to add your own functions.
 
-> scanner - finds open ports
-> analyzer - Checks TLS and cypher versions
-> sqli - basic SQL injection atempts
+
+
+scanner - finds open ports
+analyzer - Checks TLS and cypher versions
+sqli - basic SQL injection atempts
