@@ -7,5 +7,7 @@ Feel free to add your own functions.
 
 
 scanner - finds open ports
+
 analyzer - Checks TLS and cypher versions
+
 sqli - basic SQL injection atempts
