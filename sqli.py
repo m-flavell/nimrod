@@ -2,7 +2,8 @@ import urllib.request
 import urllib.error
 import urllib.parse
 import ssl
-from typing import Tuple
+import base64
+from typing import Tuple, Optional
 
 SQL_ERRORS = [
     "you have an error in your sql syntax",
@@ -13,12 +14,20 @@ SQL_ERRORS = [
     "sqlite3::sqlexception"
 ]
 
-def test_sql_injection(fqdn: str) -> Tuple[bool, str]:
+def test_sql_injection(
+    fqdn: str,
+    method: str = "GET",
+    username: Optional[str] = None,
+    password: Optional[str] = None
+) -> Tuple[bool, str]:
     """
     Tests an API for SQL injection vulnerabilities using a common payload.
 
     Args:
         fqdn (str): The Fully Qualified Domain Name of the API to test (e.g., api.example.com).
+        method (str): The HTTP method to use (e.g., "GET", "POST", "PUT"). Defaults to "GET".
+        username (Optional[str]): Username for Basic Authentication.
+        password (Optional[str]): Password for Basic Authentication.
 
     Returns:
         Tuple[bool, str]: A tuple containing a boolean indicating if an SQL injection
@@ -40,9 +49,16 @@ def test_sql_injection(fqdn: str) -> Tuple[bool, str]:
 
     for url in urls:
         try:
-            req = urllib.request.Request(url)
+            req = urllib.request.Request(url, method=method.upper())
             # Add a user agent to avoid some basic blocks
             req.add_header('User-Agent', 'Mozilla/5.0 (SQLi Test)')
+
+            # Add Basic Authentication if provided
+            if username is not None and password is not None:
+                auth_str = f"{username}:{password}"
+                auth_bytes = auth_str.encode('utf-8')
+                auth_base64 = base64.b64encode(auth_bytes).decode('utf-8')
+                req.add_header('Authorization', f'Basic {auth_base64}')
 
             with urllib.request.urlopen(req, context=ctx, timeout=5) as response:
                 body = response.read().decode('utf-8', errors='ignore')
